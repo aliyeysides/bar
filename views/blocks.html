@@ -1,0 +1,60 @@
+{{ block "head" . }}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  </title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/public/css/tailwind.css">
+  <script src="https://unpkg.com/htmx.org@1.9.10/dist/htmx.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function (_) {
+      document.body.addEventListener('htmx:beforeSwap', function (e) {
+        if (e.detail.xhr.status === 422) {
+          e.detail.shouldSwap = true;
+          e.detail.isError = false;
+        }
+      });
+    })
+  </script>
+</head>
+{{ end }}
+
+{{ block "form" . }}
+
+<div id="text-area" class="flex flex-col h-full">
+  <form class="w-full h-full" hx-post="/generate">
+
+    <div class="flex flex-row container mx-auto justify-between my-3 w-full">
+      <h1 class="flex items-center text-2xl text-white align-middle">Burn After Reading</h1>
+      {{ if .URL }}
+      <div class="flex w-auto">
+        <label for="nanoid"
+          class="flex items-center justify-center w-full text-sm text-white font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Copy
+          & Share:</label>
+        <input id="nanoid" name="nanoid"
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 text-white"
+          type="text" value="{{ .URL }}" readonly>
+      </div>
+      {{ end }}
+
+      {{ if .Error }}
+      <p class="flex items-center align-middle text-red-500 text-center">{{ .Error }}</p>
+      {{ end }}
+
+      <button type="button"
+        class="rounded-md bg-white/10 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-white/20"
+        hx-swap="outerHTML" hx-target="#text-area" hx-post="/generate">Generate URL</button>
+    </div>
+
+
+    <textarea placeholder="Write your secret message..."
+      class="flex min-h-[560px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 text-white"
+      name="input" required>{{
+      .Value
+      }}</textarea>
+  </form>
+</div>
+{{ end }}
